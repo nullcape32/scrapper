@@ -33,8 +33,7 @@ jobs:
           'https://www.gledaitv.live/watch-tv/60/nova-tv-online',
           'https://www.gledaitv.live/watch-tv/64/bnt-1-online',
           'https://www.gledaitv.live/watch-tv/35/24-kitchen-online',
-          'https://www.gledaitv.live/watch-tv/61/btv-online',
-          'https://www.bg-gledai.video/nick-jr-online'
+          'https://www.gledaitv.live/watch-tv/61/btv-online'
           ];
 
           (async () => {
