@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   schedule:
     # Run every 16 minutes from 8:00 to 23:00 only
-    - cron: "*/16 8-23 * * *"
+    - cron: "*/16 * * * *"
 
 jobs:
   scrape:
