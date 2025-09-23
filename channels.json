@@ -1,26 +1,26 @@
 [
   {
     "title": "nova-live-tv",
-    "updated": "2025-09-23T13:59:45.841Z",
-    "url": "https://cdn.stgledai.org:8082/hls/nova/index.m3u8?token=b7db799313ddb246a577d2de3fa9d556eace3a61-8eac55c04ede0309bc2036182ddde1b5-1758646462-1758635662",
-    "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+    "updated": "2025-09-23T14:21:01.987Z",
+    "url": "https://cdn.stgledai.org:8082/hls/nova/index.m3u8?token=76e0b1c74a6a2ec7c5944148e6fc418bf1291b0b-9159fadeb066241e200284d553db2f85-1758647752-1758636952",
+    "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
   },
   {
     "title": "mtv-00s-live-tv",
-    "updated": "2025-09-23T14:00:11.247Z",
-    "url": "https://cdn.stgledai.org:8082/hls/mtv00s/index.m3u8?token=77b9be2093596d674b25f1afddfcc080e4478788-cfa92bf6022fc809075a7e24cc2e5d49-1758646486-1758635686",
-    "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+    "updated": "2025-09-23T14:21:10.044Z",
+    "url": "https://cdn.stgledai.org:8082/hls/mtv00s/index.m3u8?token=c8f2b287bb98103e7c9417a278074b9267c17b46-5bf838a11f25214c2c9272f184aed38f-1758647762-1758636962",
+    "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
   },
   {
     "title": "btv-live-tv",
-    "updated": "2025-09-23T14:00:29.575Z",
-    "url": "https://cdn.stgledai.org:8082/hls/btv/index.m3u8?token=049239145d100e1b54873765718a5e82b46ee9ea-68a5c2e4b8b6c4aaa2df5ae56c4a82e4-1758646511-1758635711",
-    "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+    "updated": "2025-09-23T14:21:18.903Z",
+    "url": "https://cdn.stgledai.org:8082/hls/btv/index.m3u8?token=e0ea78696e170cccaa3eac30b899bc16fcf3d48d-0da8ea612f0f3776f4af07bb809788d7-1758647770-1758636970",
+    "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
   },
   {
     "title": "bnt-1-online",
-    "updated": "2025-09-23T14:00:51.402Z",
-    "url": "https://ipstream.xyz:8443/hls/bnt1/playlist.m3u8?e=1758643230&st=fNu9SvoBfdOV_vyJyWpfFw",
-    "headers": "Referer: https://iptv-bg.com/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+    "updated": "2025-09-23T14:21:26.720Z",
+    "url": "https://ipstream.xyz:8443/hls/bnt1/playlist.m3u8?e=1758644479&st=CBpOaPuE8AXrU7UEuFw0cg",
+    "headers": "Referer: https://iptv-bg.com/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
   }
 ]
