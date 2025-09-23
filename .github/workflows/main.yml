@@ -93,7 +93,7 @@ jobs:
               if (playlistHeaders['origin']) formattedHeaders.push(`Origin: ${playlistHeaders['origin']}`);
 
               // Use last segment of URL as title (e.g. nova-tv, bnt1)
-              const title = site.split('/').filter(Boolean).pop();
+              const title = site.split('/').filter(Boolean).pop().replace(/\.html$/i, '');
 
               results.push({
                 title,
