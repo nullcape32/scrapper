@@ -33,7 +33,7 @@ jobs:
           'https://www.gledaitv.fan/nova-live-tv.html',
           'https://www.gledaitv.fan/mtv-00s-live-tv.html',
           'https://www.gledaitv.fan/btv-live-tv.html',
-          'https://www.gledaitv.live/watch-tv/64/bnt-1-online'
+          'https://iptv-bg.com/bnt-1-online/'
           ];
 
           (async () => {
