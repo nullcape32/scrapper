@@ -3,7 +3,6 @@ name: Run M3U Scraper
 on:
   workflow_dispatch:
   schedule:
-    # Run every 16 minutes from 8:00 to 23:00 only
     - cron: "*/16 * * * *"
 
 jobs:
@@ -21,28 +20,21 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: |
-          npm install puppeteer@latest puppeteer-extra puppeteer-extra-plugin-stealth
+      - name: Install latest Puppeteer
+        run: npm install puppeteer@latest
 
       - name: Create scraper script
         run: |
           cat << 'EOF' > scraper.js
-          const puppeteer = require('puppeteer-extra');
-          const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+          const puppeteer = require('puppeteer');
           const fs = require('fs');
 
-          puppeteer.use(StealthPlugin());
-
           const urls = [
-            'https://www.gledaitv.fan/nova-live-tv.html',
-            'https://www.gledaitv.fan/mtv-00s-live-tv.html',
-            'https://www.gledaitv.fan/btv-live-tv.html',
-            'https://iptv-bg.com/bnt-1-online/',
-            'https://www.gledaitv.live/watch-tv/60/nova-tv-online'
+          'https://www.gledaitv.fan/nova-live-tv.html',
+          'https://www.gledaitv.fan/mtv-00s-live-tv.html',
+          'https://www.gledaitv.fan/btv-live-tv.html',
+          'https://iptv-bg.com/bnt-1-online/'
           ];
-
-          const delay = ms => new Promise(res => setTimeout(res, ms));
 
           (async () => {
             const browser = await puppeteer.launch({
@@ -53,78 +45,61 @@ jobs:
             const results = [];
 
             for (const site of urls) {
-              try {
-                const page = await browser.newPage();
+              const page = await browser.newPage();
+              const customUA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36';
+              await page.setUserAgent(customUA);
 
-                // Set realistic user agent and viewport
-                const customUA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36';
-                await page.setUserAgent(customUA);
-                await page.setViewport({ width: 1280, height: 800 });
+              let playlistLink = null;
+              let playlistHeaders = null;
 
-                let playlistLink = null;
-                let playlistHeaders = null;
-
-                // Catch .m3u8 requests
-                page.on('request', request => {
-                  const url = request.url();
-                  if (url.match(/\.m3u8(\?.*)?$/i) && !playlistLink) {
-                    playlistLink = url;
-                    playlistHeaders = request.headers();
-                  }
-                });
-
-                await page.goto(site, { waitUntil: 'networkidle2' });
-
-                // Wait longer for Cloudflare verification: 15–25 sec
-                await delay(15000 + Math.random() * 10000);
-
-                // Optional: wait for page content to appear
-                try {
-                  await page.waitForSelector('body', { timeout: 30000 });
-                } catch (err) {
-                  console.warn(`Timeout waiting for page content on ${site}`);
+              // Catch .m3u8 links (with or without token)
+              page.on('request', request => {
+                const url = request.url();
+                if (url.match(/\.m3u8(\?.*)?$/i) && !playlistLink) {
+                  playlistLink = url;
+                  playlistHeaders = request.headers();
                 }
+              });
 
-                // Fallback: scan HTML for .m3u8
-                if (!playlistLink) {
-                  const html = await page.content();
-                  const regex = /https?:\/\/[^\s'"]+\.m3u8[^\s'"]*/gi;
-                  const matches = html.match(regex);
-                  if (matches && matches.length > 0) {
-                    playlistLink = matches[0];
-                    playlistHeaders = {
-                      'referer': site,
-                      'user-agent': customUA,
-                      'origin': new URL(site).origin
-                    };
-                  }
+              await page.goto(site, { waitUntil: 'networkidle2' });
+              await new Promise(resolve => setTimeout(resolve, 5000));
+
+              // Fallback: scan HTML for .m3u8
+              if (!playlistLink) {
+                const html = await page.content();
+                const regex = /https?:\/\/[^\s'"]+\.m3u8[^\s'"]*/gi;
+                const matches = html.match(regex);
+                if (matches && matches.length > 0) {
+                  playlistLink = matches[0];
+                  playlistHeaders = {
+                    'referer': site,
+                    'user-agent': customUA,
+                    'origin': new URL(site).origin
+                  };
                 }
-
-                await page.close();
-
-                if (!playlistLink) {
-                  console.error(`No playlist link found for ${site}`);
-                  continue;
-                }
-
-                const formattedHeaders = [];
-                if (playlistHeaders['referer']) formattedHeaders.push(`Referer: ${playlistHeaders['referer']}`);
-                if (playlistHeaders['user-agent']) formattedHeaders.push(`User-Agent: ${playlistHeaders['user-agent']}`);
-                if (playlistHeaders['origin']) formattedHeaders.push(`Origin: ${playlistHeaders['origin']}`);
-
-                // Extract last segment of URL as title, removing .html if present
-                const title = site.split('/').filter(Boolean).pop().replace(/\.html$/i, '');
-
-                results.push({
-                  title,
-                  updated: new Date().toISOString(),
-                  url: playlistLink,
-                  headers: formattedHeaders.join('\n')
-                });
-
-              } catch (err) {
-                console.error(`Error processing ${site}:`, err.message);
               }
+
+              await page.close();
+
+              if (!playlistLink) {
+                console.error(`No playlist link found for ${site}`);
+                continue;
+              }
+
+              const formattedHeaders = [];
+              if (playlistHeaders['referer']) formattedHeaders.push(`Referer: ${playlistHeaders['referer']}`);
+              if (playlistHeaders['user-agent']) formattedHeaders.push(`User-Agent: ${playlistHeaders['user-agent']}`);
+              if (playlistHeaders['origin']) formattedHeaders.push(`Origin: ${playlistHeaders['origin']}`);
+
+              // Use last segment of URL as title (e.g. nova-tv, bnt1)
+              const title = site.split('/').filter(Boolean).pop().replace(/\.html$/i, '');
+
+              results.push({
+                title,
+                updated: new Date().toISOString(),
+                url: playlistLink,
+                headers: formattedHeaders.join('\n')
+              });
             }
 
             await browser.close();
