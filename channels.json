@@ -1,26 +1,26 @@
 [
   {
     "title": "nova-live-tv",
-    "updated": "2025-09-23T23:55:36.457Z",
-    "url": "https://cdn.stgledai.org:8082/hls/nova/index.m3u8?token=f43eb6487bb5b90681edb6f129101755a0b68cc7-4a4fbbabc4a670ac6a1e168c68c9f7d1-1758682228-1758671428",
+    "updated": "2025-09-24T03:10:25.070Z",
+    "url": "https://cdn.stgledai.org:8082/hls/nova/index.m3u8?token=be04034888a7647d235b9a87d4aba861e17b62ac-b6fb2d6522a9ef379a6777538f1d6c30-1758693917-1758683117",
     "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
   },
   {
     "title": "mtv-00s-live-tv",
-    "updated": "2025-09-23T23:55:44.713Z",
-    "url": "https://cdn.stgledai.org:8082/hls/mtv00s/index.m3u8?token=a26c6f10c6d3a8ccd123be132c6719f04a909a05-78f1bf32431e531cdafe1d9bfff1dde3-1758682236-1758671436",
+    "updated": "2025-09-24T03:10:32.753Z",
+    "url": "https://cdn.stgledai.org:8082/hls/mtv00s/index.m3u8?token=2445d04734d3991b8c3653bf2be14ecef5886ca5-0719111600aef89bde4b47e6a06597a5-1758693925-1758683125",
     "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
   },
   {
     "title": "btv-live-tv",
-    "updated": "2025-09-23T23:55:52.431Z",
-    "url": "https://cdn.stgledai.org:8082/hls/btv/index.m3u8?token=0fd602c7933e749abd96d1ef1e5b659635d7ba84-d3006c30fad5d25f5a0bb23efeacb0ea-1758682245-1758671445",
+    "updated": "2025-09-24T03:10:40.268Z",
+    "url": "https://cdn.stgledai.org:8082/hls/btv/index.m3u8?token=5c60e6753b502f4990e30aff4f0b08301cad2e88-9299b397b32e19eed212ebb91dba3826-1758693933-1758683133",
     "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
   },
   {
     "title": "bnt-1-online",
-    "updated": "2025-09-23T23:55:59.543Z",
-    "url": "https://ipstream.xyz:8443/hls/bnt1/playlist.m3u8?e=1758678953&st=R9l0KmD9wVM7xEzawAjsIA",
+    "updated": "2025-09-24T03:10:48.233Z",
+    "url": "https://ipstream.xyz:8443/hls/bnt1/playlist.m3u8?e=1758690640&st=azF1s5wMw9b2Hp8diO6Qcg",
     "headers": "Referer: https://iptv-bg.com/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
   }
 ]
