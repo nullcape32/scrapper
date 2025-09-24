@@ -29,13 +29,18 @@ jobs:
           const puppeteer = require('puppeteer');
           const fs = require('fs');
 
+          // helper sleep function
+          function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+          }
+
           const urls = [
-          'https://iptv-bg.com/bnt-1-online/',
-          'https://www.gledaitv.fan/nova-live-tv.html',
-          'https://www.gledaitv.fan/btv-live-tv.html',
-          'https://www.gledaitv.fan/mtv-hits-live-tv.html',
-          'https://www.gledaitv.fan/mtv-00s-live-tv.html',
-          'https://xittv.net/mtv-hits.html'
+            'https://iptv-bg.com/bnt-1-online/',
+            'https://www.gledaitv.fan/nova-live-tv.html',
+            'https://www.gledaitv.fan/btv-live-tv.html',
+            'https://www.gledaitv.fan/mtv-hits-live-tv.html',
+            'https://www.gledaitv.fan/mtv-00s-live-tv.html',
+            'https://xittv.net/mtv-hits.html'
           ];
 
           (async () => {
@@ -67,19 +72,15 @@ jobs:
 
               if (site.includes('xittv.net')) {
                 try {
-                  // Wait for play button and click it
                   await page.waitForSelector('button, .plyr__control', { timeout: 5000 });
                   await page.click('button, .plyr__control');
                   console.log(`Clicked play button on ${site}`);
-
-                  // Give time for .m3u8 request
-                  await page.waitForTimeout(7000);
+                  await sleep(7000); // wait for .m3u8 request
                 } catch (err) {
                   console.warn(`Could not find/play video on ${site}:`, err.message);
                 }
               } else {
-                // Default wait for other sites
-                await page.waitForTimeout(5000);
+                await sleep(5000); // wait for other sites
               }
 
               // Fallback: scan HTML for .m3u8 if not captured
