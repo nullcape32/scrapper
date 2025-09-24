@@ -8,7 +8,6 @@ on:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -30,11 +29,12 @@ jobs:
           const fs = require('fs');
 
           const urls = [
-          'https://iptv-bg.com/bnt-1-online/',
-          'https://www.gledaitv.fan/nova-live-tv.html',
-          'https://www.gledaitv.fan/btv-live-tv.html',
-          'https://www.gledaitv.fan/mtv-hits-live-tv.html',
-          'https://www.gledaitv.fan/mtv-00s-live-tv.html'
+            'https://iptv-bg.com/bnt-1-online/',
+            'https://www.gledaitv.fan/nova-live-tv.html',
+            'https://www.gledaitv.fan/btv-live-tv.html',
+            'https://www.gledaitv.fan/mtv-hits-live-tv.html',
+            'https://www.gledaitv.fan/mtv-00s-live-tv.html',
+            'https://xittv.net/mtv-hits.html'
           ];
 
           (async () => {
@@ -53,7 +53,7 @@ jobs:
               let playlistLink = null;
               let playlistHeaders = null;
 
-              // Catch .m3u8 links (with or without token)
+              // Catch .m3u8 links
               page.on('request', request => {
                 const url = request.url();
                 if (url.match(/\.m3u8(\?.*)?$/i) && !playlistLink) {
@@ -92,7 +92,7 @@ jobs:
               if (playlistHeaders['user-agent']) formattedHeaders.push(`User-Agent: ${playlistHeaders['user-agent']}`);
               if (playlistHeaders['origin']) formattedHeaders.push(`Origin: ${playlistHeaders['origin']}`);
 
-              // Use last segment of URL as title (e.g. nova-tv, bnt1)
+              // Use last segment of URL as title
               const title = site.split('/').filter(Boolean).pop().replace(/\.html$/i, '');
 
               results.push({
@@ -118,5 +118,5 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add channels.json
-          git commit -m "Update channels list" || echo "No changes to commit"
+          git diff --quiet && echo "No changes" || git commit -m "Update channels list"
           git push
