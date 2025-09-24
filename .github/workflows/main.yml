@@ -35,7 +35,7 @@ jobs:
           'https://www.gledaitv.fan/btv-live-tv.html',
           'https://www.gledaitv.fan/mtv-hits-live-tv.html',
           'https://www.gledaitv.fan/mtv-00s-live-tv.html',
-          'https://xittv.net/vh1clas.html'
+          'https://xittv.net/mtv-hits.html'
           ];
 
           (async () => {
@@ -54,7 +54,7 @@ jobs:
               let playlistLink = null;
               let playlistHeaders = null;
 
-              // Catch .m3u8 links (with or without token)
+              // Catch .m3u8 requests
               page.on('request', request => {
                 const url = request.url();
                 if (url.match(/\.m3u8(\?.*)?$/i) && !playlistLink) {
@@ -64,9 +64,25 @@ jobs:
               });
 
               await page.goto(site, { waitUntil: 'networkidle2' });
-              await new Promise(resolve => setTimeout(resolve, 5000));
 
-              // Fallback: scan HTML for .m3u8
+              if (site.includes('xittv.net')) {
+                try {
+                  // Wait for play button and click it
+                  await page.waitForSelector('button, .plyr__control', { timeout: 5000 });
+                  await page.click('button, .plyr__control');
+                  console.log(`Clicked play button on ${site}`);
+
+                  // Give time for .m3u8 request
+                  await page.waitForTimeout(7000);
+                } catch (err) {
+                  console.warn(`Could not find/play video on ${site}:`, err.message);
+                }
+              } else {
+                // Default wait for other sites
+                await page.waitForTimeout(5000);
+              }
+
+              // Fallback: scan HTML for .m3u8 if not captured
               if (!playlistLink) {
                 const html = await page.content();
                 const regex = /https?:\/\/[^\s'"]+\.m3u8[^\s'"]*/gi;
