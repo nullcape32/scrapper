@@ -1,1 +1,38 @@
-
+[
+  {
+    "title": "bnt-1-online",
+    "updated": "2025-09-24T17:05:51.068Z",
+    "url": "https://ipstream.xyz:8443/hls/bnt1/playlist.m3u8?e=1758740745&st=Wy0J4kLIbF1NRwSynwjiIQ",
+    "headers": "Referer: https://iptv-bg.com/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+  },
+  {
+    "title": "nova-live-tv",
+    "updated": "2025-09-24T17:06:00.578Z",
+    "url": "https://cdn.stgledai.org:8082/hls/nova/index.m3u8?token=bcf933ac3f1e52aa393127213aa7e2b1b6c4ab83-874348eb33ff1b608e7086ea366d4420-1758744051-1758733251",
+    "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+  },
+  {
+    "title": "btv-live-tv",
+    "updated": "2025-09-24T17:06:10.117Z",
+    "url": "https://cdn.stgledai.org:8082/hls/btv/index.m3u8?token=a572a29030bfdd49b081d54b9f3d40d5a356979d-6849afbd81efb423e4fd3a056c0bd58a-1758744060-1758733260",
+    "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+  },
+  {
+    "title": "mtv-hits-live-tv",
+    "updated": "2025-09-24T17:06:19.186Z",
+    "url": "https://cdn.stgledai.org:8082/hls/mtvhits/index.m3u8?token=c0cef7b602a43eb10da9f340fec73093af1fefd7-025bbd63f77b4526bec4a043501778a1-1758744071-1758733271",
+    "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+  },
+  {
+    "title": "mtv-00s-live-tv",
+    "updated": "2025-09-24T17:06:27.703Z",
+    "url": "https://cdn.stgledai.org:8082/hls/mtv00s/index.m3u8?token=4da908b321eb9a0238026847cb90e8de79acfeae-4db3f95bbc611b3b1fb98d40aeac4e6c-1758744079-1758733279",
+    "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+  },
+  {
+    "title": "mtv-90s",
+    "updated": "2025-09-24T17:06:34.108Z",
+    "url": "https://autopilot.catcast.tv/mobile.m3u8?channel_id=39803&token=27f5da9adc9dbc7938a0f835400f11c2",
+    "headers": "Referer: https://smotret.tv/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+  }
+]
