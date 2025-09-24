@@ -1,44 +1,38 @@
 [
   {
     "title": "bnt-1-online",
-    "updated": "2025-09-24T18:17:42.978Z",
-    "url": "https://ipstream.xyz:8443/hls/bnt1/playlist.m3u8?e=1758745057&st=UGJqki734-dQgNycTMfeLg",
+    "updated": "2025-09-24T18:22:07.271Z",
+    "url": "https://ipstream.xyz:8443/hls/bnt1/playlist.m3u8?e=1758745321&st=UwYY197kt5Mw0Tb50CcOuA",
     "headers": "Referer: https://iptv-bg.com/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
   },
   {
     "title": "nova-live-tv",
-    "updated": "2025-09-24T18:17:53.018Z",
-    "url": "https://cdn.stgledai.org:8082/hls/nova/index.m3u8?token=510dcbe7427b37e605d880c29d5ac3426b92e848-17d9e5c2d39aa7510deedc7fe888c115-1758748363-1758737563",
+    "updated": "2025-09-24T18:22:17.448Z",
+    "url": "https://cdn.stgledai.org:8082/hls/nova/index.m3u8?token=1a6e76cf9b5e74cf0868159dcb586a16d82c8bdb-e8bbedde0cb25895ee88b58f8052e8ba-1758748629-1758737829",
     "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
   },
   {
     "title": "btv-live-tv",
-    "updated": "2025-09-24T18:18:00.804Z",
-    "url": "https://cdn.stgledai.org:8082/hls/btv/index.m3u8?token=7cc6dc59648982fe40a1388535e3e1d559229b1d-f6440549c7eb2ce17072eb08cc605efd-1758748373-1758737573",
+    "updated": "2025-09-24T18:22:25.039Z",
+    "url": "https://cdn.stgledai.org:8082/hls/btv/index.m3u8?token=af0ff6ff1a5cfcdbd232ba6904ebac177ed48a12-7df23a3d5d10418be524975f0e49e3ba-1758748637-1758737837",
     "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
   },
   {
     "title": "mtv-hits-live-tv",
-    "updated": "2025-09-24T18:18:08.399Z",
-    "url": "https://cdn.stgledai.org:8082/hls/mtvhits/index.m3u8?token=027615e4b8c8bea06cff86d65de69cc52063a9d6-1199c853e9937747568ce495841b77da-1758748381-1758737581",
+    "updated": "2025-09-24T18:22:32.533Z",
+    "url": "https://cdn.stgledai.org:8082/hls/mtvhits/index.m3u8?token=8cb0989f9a162a4f6be8c0fd045131acc06014a4-e6fd739ba3eea2f268c0fb85f92e5c1d-1758748645-1758737845",
     "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
   },
   {
     "title": "mtv-00s-live-tv",
-    "updated": "2025-09-24T18:18:16.096Z",
-    "url": "https://cdn.stgledai.org:8082/hls/mtv00s/index.m3u8?token=32169131cdd780162718191eaa79a35d856796b4-dc47bfede7f22e222324e5487d206c84-1758748388-1758737588",
+    "updated": "2025-09-24T18:22:40.031Z",
+    "url": "https://cdn.stgledai.org:8082/hls/mtv00s/index.m3u8?token=ab7f814891eef506fdb70076e7c1e9c221c6578f-ba8726a8f012b4b5b2aa0d8432afd459-1758748652-1758737852",
     "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
   },
   {
     "title": "mtv-90s",
-    "updated": "2025-09-24T18:18:23.007Z",
+    "updated": "2025-09-24T18:22:46.436Z",
     "url": "https://autopilot.catcast.tv/mobile.m3u8?channel_id=39803&token=27f5da9adc9dbc7938a0f835400f11c2",
     "headers": "Referer: https://smotret.tv/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
-  },
-  {
-    "title": "mtv-hits",
-    "updated": "2025-09-24T18:18:30.584Z",
-    "url": "https://s.xittv.net/204/index.m3u8?k=1758755903p032i002i632i46Sc77a3bd9ceca92d3d6b2b7a48006a396",
-    "headers": "Referer: https://xittv.net/mtv-hits.html\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36\nOrigin: https://xittv.net"
   }
 ]
