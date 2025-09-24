@@ -29,18 +29,12 @@ jobs:
           const puppeteer = require('puppeteer');
           const fs = require('fs');
 
-          // helper sleep function
-          function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-          }
-
           const urls = [
-            'https://iptv-bg.com/bnt-1-online/',
-            'https://www.gledaitv.fan/nova-live-tv.html',
-            'https://www.gledaitv.fan/btv-live-tv.html',
-            'https://www.gledaitv.fan/mtv-hits-live-tv.html',
-            'https://www.gledaitv.fan/mtv-00s-live-tv.html',
-            'https://xittv.net/mtv-hits.html'
+          'https://iptv-bg.com/bnt-1-online/',
+          'https://www.gledaitv.fan/nova-live-tv.html',
+          'https://www.gledaitv.fan/btv-live-tv.html',
+          'https://www.gledaitv.fan/mtv-hits-live-tv.html',
+          'https://www.gledaitv.fan/mtv-00s-live-tv.html'
           ];
 
           (async () => {
@@ -59,7 +53,7 @@ jobs:
               let playlistLink = null;
               let playlistHeaders = null;
 
-              // Catch .m3u8 requests
+              // Catch .m3u8 links (with or without token)
               page.on('request', request => {
                 const url = request.url();
                 if (url.match(/\.m3u8(\?.*)?$/i) && !playlistLink) {
@@ -69,27 +63,9 @@ jobs:
               });
 
               await page.goto(site, { waitUntil: 'networkidle2' });
+              await new Promise(resolve => setTimeout(resolve, 5000));
 
-              if (site.includes('xittv.net')) {
-                try {
-                  await page.waitForSelector('button, .plyr__control', { timeout: 5000 });
-                  await page.click('button, .plyr__control');
-                  console.log(`Clicked play button on ${site}`);
-                  await sleep(7000); // wait for .m3u8 request
-                } catch (err) {
-                  console.warn(`Could not find/play video on ${site}:`, err.message);
-                }
-
-                // Enforce strict .m3u8 filter (must END with .m3u8)
-                if (playlistLink && !playlistLink.match(/\.m3u8$/i)) {
-                  console.warn(`Filtered out non-m3u8 link from ${site}: ${playlistLink}`);
-                  playlistLink = null;
-                }
-              } else {
-                await sleep(5000); // wait for other sites
-              }
-
-              // Fallback: scan HTML for .m3u8 if not captured
+              // Fallback: scan HTML for .m3u8
               if (!playlistLink) {
                 const html = await page.content();
                 const regex = /https?:\/\/[^\s'"]+\.m3u8[^\s'"]*/gi;
