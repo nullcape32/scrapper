@@ -1,32 +1,123 @@
-[
-  {
-    "title": "bnt-1-online",
-    "updated": "2025-09-24T16:48:30.332Z",
-    "url": "https://ipstream.xyz:8443/hls/bnt1/playlist.m3u8?e=1758739704&st=OiKq2SApXjQiN_3UjvqMsg",
-    "headers": "Referer: https://iptv-bg.com/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
-  },
-  {
-    "title": "nova-live-tv",
-    "updated": "2025-09-24T16:48:41.017Z",
-    "url": "https://cdn.stgledai.org:8082/hls/nova/index.m3u8?token=ad357304764770c8d4c32b6c064a983558ad4b90-fb6f71fe3d062d9324831847da9d561d-1758743010-1758732210",
-    "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
-  },
-  {
-    "title": "btv-live-tv",
-    "updated": "2025-09-24T16:48:48.698Z",
-    "url": "https://cdn.stgledai.org:8082/hls/btv/index.m3u8?token=b46d88053a30d39f21c475f22e46d6f729413061-774c1a76209d4611d6bc772eede831aa-1758743021-1758732221",
-    "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
-  },
-  {
-    "title": "mtv-hits-live-tv",
-    "updated": "2025-09-24T16:48:56.684Z",
-    "url": "https://cdn.stgledai.org:8082/hls/mtvhits/index.m3u8?token=26b239addd9cc8e4937510d92b568c23564c157b-8bb582283c78dc958d68ed94ba359d81-1758743029-1758732229",
-    "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
-  },
-  {
-    "title": "mtv-00s-live-tv",
-    "updated": "2025-09-24T16:49:04.003Z",
-    "url": "https://cdn.stgledai.org:8082/hls/mtv00s/index.m3u8?token=2f25a66f8e8273c851c53187f7ecf829d27512bc-f3b08ce59aefa4ebbdd32777958aa3a6-1758743036-1758732236",
-    "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
-  }
-]
+name: Run M3U Scraper
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/59 * * * *"
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install latest Puppeteer
+        run: npm install puppeteer@latest
+
+      - name: Create scraper script
+        run: |
+          cat << 'EOF' > scraper.js
+          const puppeteer = require('puppeteer');
+          const fs = require('fs');
+
+          const urls = [
+          'https://iptv-bg.com/bnt-1-online/',
+          'https://www.gledaitv.fan/nova-live-tv.html',
+          'https://www.gledaitv.fan/btv-live-tv.html',
+          'https://www.gledaitv.fan/mtv-hits-live-tv.html',
+          'https://www.gledaitv.fan/mtv-00s-live-tv.html',
+          'https://smotret.tv/music/mtv-90s'
+          ];
+
+          (async () => {
+            const browser = await puppeteer.launch({
+              headless: true,
+              args: ['--no-sandbox', '--disable-setuid-sandbox']
+            });
+
+            const results = [];
+
+            for (const site of urls) {
+              const page = await browser.newPage();
+              const customUA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36';
+              await page.setUserAgent(customUA);
+
+              let playlistLink = null;
+              let playlistHeaders = null;
+
+              // Catch .m3u8 links (with or without token)
+              page.on('request', request => {
+                const url = request.url();
+                if (url.match(/\.m3u8(\?.*)?$/i) && !playlistLink) {
+                  playlistLink = url;
+                  playlistHeaders = request.headers();
+                }
+              });
+
+              await page.goto(site, { waitUntil: 'networkidle2' });
+              await new Promise(resolve => setTimeout(resolve, 5000));
+
+              // Fallback: scan HTML for .m3u8
+              if (!playlistLink) {
+                const html = await page.content();
+                const regex = /https?:\/\/[^\s'"]+\.m3u8[^\s'"]*/gi;
+                const matches = html.match(regex);
+                if (matches && matches.length > 0) {
+                  playlistLink = matches[0];
+                  playlistHeaders = {
+                    'referer': site,
+                    'user-agent': customUA,
+                    'origin': new URL(site).origin
+                  };
+                }
+              }
+
+              await page.close();
+
+              if (!playlistLink) {
+                console.error(`No playlist link found for ${site}`);
+                continue;
+              }
+
+              const formattedHeaders = [];
+              if (playlistHeaders['referer']) formattedHeaders.push(`Referer: ${playlistHeaders['referer']}`);
+              if (playlistHeaders['user-agent']) formattedHeaders.push(`User-Agent: ${playlistHeaders['user-agent']}`);
+              if (playlistHeaders['origin']) formattedHeaders.push(`Origin: ${playlistHeaders['origin']}`);
+
+              // Use last segment of URL as title (e.g. nova-tv, bnt1)
+              const title = site.split('/').filter(Boolean).pop().replace(/\.html$/i, '');
+
+              results.push({
+                title,
+                updated: new Date().toISOString(),
+                url: playlistLink,
+                headers: formattedHeaders.join('\n')
+              });
+            }
+
+            await browser.close();
+
+            fs.writeFileSync('channels.json', JSON.stringify(results, null, 2));
+            console.log('All playlist links saved to channels.json:\n', results);
+          })();
+          EOF
+
+      - name: Run scraper
+        run: node scraper.js
+
+      - name: Commit & Push JSON
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add channels.json
+          git commit -m "Update channels list" || echo "No changes to commit"
+          git push
