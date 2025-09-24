@@ -3,7 +3,7 @@ name: Run M3U Scraper
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/16 * * * *"
+    - cron: "*/59 * * * *"
 
 jobs:
   scrape:
