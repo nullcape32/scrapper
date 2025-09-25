@@ -30,7 +30,6 @@ jobs:
           const fs = require('fs');
 
           const urls = [
-          'https://www.bg-gledai.video/online-bnt',
           'https://www.gledaitv.fan/nova-live-tv.html',
           'https://www.gledaitv.fan/btv-live-tv.html',
           'https://www.gledaitv.fan/mtv-hits-live-tv.html',
