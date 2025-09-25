@@ -22,11 +22,6 @@
     "updated": "2025-09-25T18:50:44.403Z",
     "url": "https://cdn.stgledai.org:8082/hls/mtv00s/index.m3u8?token=828a9a88f3837c58ba35c30de76b33f4bdeef9e6-ed0966189a41bc945cbf2d8ab6bc7a3d-1758836737-1758825937",
     "headers": "Referer: https://cdn.gledaitv.fan/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
-  },
-  {
-    "title": "mtv-90s",
-    "updated": "2025-09-25T18:50:50.891Z",
-    "url": "https://autopilot.catcast.tv/mobile.m3u8?channel_id=39803&token=99e5d915c26125f59f54c4487dc609cd",
-    "headers": "Referer: https://smotret.tv/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
   }
+  
 ]
