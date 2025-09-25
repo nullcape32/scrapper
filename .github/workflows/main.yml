@@ -34,7 +34,8 @@ jobs:
           'https://www.gledaitv.fan/btv-live-tv.html',
           'https://www.gledaitv.fan/mtv-hits-live-tv.html',
           'https://www.gledaitv.fan/mtv-00s-live-tv.html',
-          'https://smotret.tv/music/mtv-90s'
+          'https://smotret.tv/music/mtv-90s',
+'https://tv.vnoo.net/livetv/mtv-90s/mtv90s.html'
           ];
 
           (async () => {
