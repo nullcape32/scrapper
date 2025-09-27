@@ -1,111 +1,145 @@
-// This script is ready to be run via GitHub Actions with puppeteer-extra, stealth, and outputs channels.json.
-// It strictly extracts .m3u8 links from smotret-tv.live, as per your requirements.
+name: Run M3U Scraper with Stealth
 
-const puppeteer = require('puppeteer-extra');
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-const fs = require('fs');
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 */1 * * *"
 
-puppeteer.use(StealthPlugin());
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
 
-const urls = [
-  'https://smotret-tv.live/mezzo.html'
-];
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-const delay = ms => new Promise(res => setTimeout(res, ms));
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-(async () => {
-  const browser = await puppeteer.launch({
-    headless: true, // Use headless:true for GitHub Actions
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
-  });
+      - name: Install Puppeteer Extra and Stealth Plugin
+        run: npm install puppeteer-extra puppeteer-extra-plugin-stealth
 
-  const results = [];
+      - name: Create scraper script
+        run: |
+          cat << 'EOF' > scraper.js
+          const puppeteer = require('puppeteer-extra');
+          const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+          const fs = require('fs');
 
-  for (const site of urls) {
-    try {
-      const page = await browser.newPage();
+          puppeteer.use(StealthPlugin());
 
-      const customUA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36';
-      await page.setUserAgent(customUA);
-      await page.setViewport({ width: 1280, height: 800 });
+          const urls = [
+            'https://www.gledaitv.fan/nova-live-tv.html',
+            'https://www.gledaitv.fan/btv-live-tv.html',
+            'https://www.gledaitv.fan/mtv-hits-live-tv.html',
+            'https://www.gledaitv.fan/mtv-00s-live-tv.html',
+            'https://smotret-tv.live/mezzo.html'
+          ];
 
-      let playlistLink = null;
-      let playlistHeaders = null;
+          (async () => {
+            const browser = await puppeteer.launch({
+              headless: true,
+              args: ['--no-sandbox', '--disable-setuid-sandbox']
+            });
 
-      // === Strict request listener: only accept URLs that end EXACTLY with ".m3u8" ===
-      page.on('request', request => {
-        const url = request.url();
-        // Only match if the whole URL ends with .m3u8 (no ? or #)
-        if (/^https?:\/\/[^\s'"]+\.m3u8$/i.test(url) && !playlistLink) {
-          playlistLink = url;
-          playlistHeaders = request.headers();
-          console.log('FOUND strict .m3u8 via request:', playlistLink);
-        }
-      });
+            const results = [];
 
-      await page.goto(site, { waitUntil: 'networkidle2', timeout: 60000 });
+            for (const site of urls) {
+              const page = await browser.newPage();
+              const customUA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36';
+              await page.setUserAgent(customUA);
 
-      // Wait for Cloudflare (30–40 sec)
-      await delay(30000 + Math.random() * 10000);
+              let playlistLink = null;
+              let playlistHeaders = null;
 
-      try {
-        await page.waitForSelector('body', { timeout: 60000 });
-      } catch {
-        console.warn(`Timeout waiting for page content on ${site}`);
-      }
+              // Catch .m3u8 links (with or without token)
+              page.on('request', request => {
+                const url = request.url();
+                // For smotret-tv.live, only extract links that end in .m3u8
+                if (
+                  site.includes('smotret-tv.live') ?
+                    /^https?:\/\/[^\s'"]+\.m3u8$/i.test(url) :
+                    /\.m3u8(\?.*)?$/i.test(url)
+                ) {
+                  if (!playlistLink) {
+                    playlistLink = url;
+                    playlistHeaders = request.headers();
+                  }
+                }
+              });
 
-      // === Fallback: scan HTML but only accept literal links that end with .m3u8 ===
-      if (!playlistLink) {
-        const html = await page.content();
+              await page.goto(site, { waitUntil: 'networkidle2' });
+              await new Promise(resolve => setTimeout(resolve, 5000));
 
-        // This regex finds http(s) links whose path ends with ".m3u8" and is immediately followed
-        // by a quote, whitespace, angle bracket, closing parenthesis or end-of-string.
-        // It will NOT match ".m3u8?token=..." or ".m3u8#frag".
-        const regex = /https?:\/\/[^\s'"]+?\.m3u8(?=(?:['"\s<>)]|$))/gi;
-        const matches = html.match(regex) || [];
+              // Fallback: scan HTML for .m3u8
+              if (!playlistLink) {
+                const html = await page.content();
+                let regex;
+                if (site.includes('smotret-tv.live')) {
+                  // Only match links that end in .m3u8 for smotret-tv.live
+                  regex = /https?:\/\/[^\s'"<>]+\.m3u8\b/gi;
+                } else {
+                  // Regular fallback for other sites
+                  regex = /https?:\/\/[^\s'"]+\.m3u8[^\s'"]*/gi;
+                }
+                const matches = html.match(regex);
+                if (matches && matches.length > 0) {
+                  // For smotret-tv.live: strict match, otherwise first match
+                  const firstMatch = site.includes('smotret-tv.live')
+                    ? matches.find(m => /\.m3u8$/i.test(m))
+                    : matches[0];
+                  if (firstMatch) {
+                    playlistLink = firstMatch;
+                    playlistHeaders = {
+                      'referer': site,
+                      'user-agent': customUA,
+                      'origin': new URL(site).origin
+                    };
+                  }
+                }
+              }
 
-        // Extra safety: ensure the extracted string literally ends with ".m3u8"
-        const strictMatches = matches.filter(m => /\.m3u8$/i.test(m));
+              await page.close();
 
-        if (strictMatches.length > 0) {
-          playlistLink = strictMatches[0];
-          playlistHeaders = {
-            'referer': site,
-            'user-agent': customUA,
-            'origin': new URL(site).origin
-          };
-          console.log('FOUND strict .m3u8 via HTML scan:', playlistLink);
-        }
-      }
+              if (!playlistLink) {
+                console.error(`No playlist link found for ${site}`);
+                continue;
+              }
 
-      await page.close();
+              const formattedHeaders = [];
+              if (playlistHeaders['referer']) formattedHeaders.push(`Referer: ${playlistHeaders['referer']}`);
+              if (playlistHeaders['user-agent']) formattedHeaders.push(`User-Agent: ${playlistHeaders['user-agent']}`);
+              if (playlistHeaders['origin']) formattedHeaders.push(`Origin: ${playlistHeaders['origin']}`);
 
-      if (!playlistLink) {
-        console.error(`No strict .m3u8 link found for ${site}`);
-        continue;
-      }
+              // Use last segment of URL as title (e.g. nova-tv, bnt1)
+              const title = site.split('/').filter(Boolean).pop().replace(/\.html$/i, '');
 
-      const formattedHeaders = [];
-      if (playlistHeaders?.referer) formattedHeaders.push(`Referer: ${playlistHeaders.referer}`);
-      if (playlistHeaders?.['user-agent']) formattedHeaders.push(`User-Agent: ${playlistHeaders['user-agent']}`);
-      if (playlistHeaders?.origin) formattedHeaders.push(`Origin: ${playlistHeaders.origin}`);
+              results.push({
+                title,
+                updated: new Date().toISOString(),
+                url: playlistLink,
+                headers: formattedHeaders.join('\n')
+              });
+            }
 
-      const title = site.split('/').filter(Boolean).pop().replace(/\.html$/i, '');
+            await browser.close();
 
-      results.push({
-        title,
-        updated: new Date().toISOString(),
-        url: playlistLink,
-        headers: formattedHeaders.join('\n')
-      });
+            fs.writeFileSync('channels.json', JSON.stringify(results, null, 2));
+            console.log('All playlist links saved to channels.json:\n', results);
+          })();
+          EOF
 
-    } catch (err) {
-      console.error(`Error processing ${site}:`, err.message);
-    }
-  }
+      - name: Run scraper
+        run: node scraper.js
 
-  await browser.close();
-
-  fs.writeFileSync('channels.json', JSON.stringify(results, null, 2));
-  console.log('All strict playlist links saved to channels.json');
-})();
+      - name: Commit & Push JSON
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add channels.json
+          git commit -m "Update channels list (.m3u8 strict, stealth)" || echo "No changes to commit"
+          git push
