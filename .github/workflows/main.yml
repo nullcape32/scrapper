@@ -1,4 +1,4 @@
-name: Run M3U Scraper with Stealth
+name: Run M3U Scraper
 
 on:
   workflow_dispatch:
@@ -20,24 +20,20 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Puppeteer Extra and Stealth Plugin
-        run: npm install puppeteer-extra puppeteer-extra-plugin-stealth
+      - name: Install latest Puppeteer
+        run: npm install puppeteer@latest
 
       - name: Create scraper script
         run: |
           cat << 'EOF' > scraper.js
-          const puppeteer = require('puppeteer-extra');
-          const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+          const puppeteer = require('puppeteer');
           const fs = require('fs');
 
-          puppeteer.use(StealthPlugin());
-
           const urls = [
-            'https://www.gledaitv.fan/nova-live-tv.html',
-            'https://www.gledaitv.fan/btv-live-tv.html',
-            'https://www.gledaitv.fan/mtv-hits-live-tv.html',
-            'https://www.gledaitv.fan/mtv-00s-live-tv.html',
-            'https://smotret-tv.live/mezzo.html'
+          'https://www.gledaitv.fan/nova-live-tv.html',
+          'https://www.gledaitv.fan/btv-live-tv.html',
+          'https://www.gledaitv.fan/mtv-hits-live-tv.html',
+          'https://www.gledaitv.fan/mtv-00s-live-tv.html'
           ];
 
           (async () => {
@@ -59,16 +55,9 @@ jobs:
               // Catch .m3u8 links (with or without token)
               page.on('request', request => {
                 const url = request.url();
-                // For smotret-tv.live, only extract links that end in .m3u8
-                if (
-                  site.includes('smotret-tv.live') ?
-                    /^https?:\/\/[^\s'"]+\.m3u8$/i.test(url) :
-                    /\.m3u8(\?.*)?$/i.test(url)
-                ) {
-                  if (!playlistLink) {
-                    playlistLink = url;
-                    playlistHeaders = request.headers();
-                  }
+                if (url.match(/\.m3u8(\?.*)?$/i) && !playlistLink) {
+                  playlistLink = url;
+                  playlistHeaders = request.headers();
                 }
               });
 
@@ -78,28 +67,15 @@ jobs:
               // Fallback: scan HTML for .m3u8
               if (!playlistLink) {
                 const html = await page.content();
-                let regex;
-                if (site.includes('smotret-tv.live')) {
-                  // Only match links that end in .m3u8 for smotret-tv.live
-                  regex = /https?:\/\/[^\s'"<>]+\.m3u8\b/gi;
-                } else {
-                  // Regular fallback for other sites
-                  regex = /https?:\/\/[^\s'"]+\.m3u8[^\s'"]*/gi;
-                }
+                const regex = /https?:\/\/[^\s'"]+\.m3u8[^\s'"]*/gi;
                 const matches = html.match(regex);
                 if (matches && matches.length > 0) {
-                  // For smotret-tv.live: strict match, otherwise first match
-                  const firstMatch = site.includes('smotret-tv.live')
-                    ? matches.find(m => /\.m3u8$/i.test(m))
-                    : matches[0];
-                  if (firstMatch) {
-                    playlistLink = firstMatch;
-                    playlistHeaders = {
-                      'referer': site,
-                      'user-agent': customUA,
-                      'origin': new URL(site).origin
-                    };
-                  }
+                  playlistLink = matches[0];
+                  playlistHeaders = {
+                    'referer': site,
+                    'user-agent': customUA,
+                    'origin': new URL(site).origin
+                  };
                 }
               }
 
@@ -141,5 +117,5 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add channels.json
-          git commit -m "Update channels list (.m3u8 strict, stealth)" || echo "No changes to commit"
+          git commit -m "Update channels list" || echo "No changes to commit"
           git push
