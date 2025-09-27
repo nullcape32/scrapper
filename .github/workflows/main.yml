@@ -33,8 +33,6 @@ jobs:
           'https://www.bg-gledai.video/btv-online',
           'https://www.bg-gledai.video/online-nova-tv-bg',
           'https://www.bg-gledai.video/online-kino-nova-bg'
-          'https://www.gledaitv.fan/mtv-hits-live-tv.html',
-          'https://www.gledaitv.fan/mtv-00s-live-tv.html',
           ];
 
           (async () => {
