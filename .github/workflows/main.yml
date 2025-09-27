@@ -20,22 +20,24 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install latest Puppeteer
-        run: npm install puppeteer@latest
+      - name: Install dependencies
+        run: |
+          npm install puppeteer-extra puppeteer-extra-plugin-stealth
 
       - name: Create scraper script
         run: |
           cat << 'EOF' > scraper.js
-          const puppeteer = require('puppeteer');
+          const puppeteer = require('puppeteer-extra');
+          const StealthPlugin = require('puppeteer-extra-plugin-stealth');
           const fs = require('fs');
 
+          puppeteer.use(StealthPlugin());
+
           const urls = [
-            'https://www.gledaitv.fan/nova-live-tv.html',
-            'https://www.gledaitv.fan/btv-live-tv.html',
-            'https://www.gledaitv.fan/mtv-hits-live-tv.html',
-            'https://www.gledaitv.fan/mtv-00s-live-tv.html',
             'https://smotret-tv.live/mezzo.html'
           ];
+
+          const delay = ms => new Promise(res => setTimeout(res, ms));
 
           (async () => {
             const browser = await puppeteer.launch({
@@ -46,90 +48,98 @@ jobs:
             const results = [];
 
             for (const site of urls) {
-              const page = await browser.newPage();
-              const customUA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36';
-              await page.setUserAgent(customUA);
+              try {
+                const page = await browser.newPage();
 
-              let playlistLink = null;
-              let playlistHeaders = null;
-              const isSmotret = site.startsWith('https://smotret-tv.live/');
+                const customUA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36';
+                await page.setUserAgent(customUA);
+                await page.setViewport({ width: 1280, height: 800 });
 
-              // Catch .m3u8 links
-              page.on('request', request => {
-                const url = request.url();
-                if (isSmotret) {
-                  // Only strict .m3u8 endings for smotret-tv
+                let playlistLink = null;
+                let playlistHeaders = null;
+
+                // === Strict request listener: only accept URLs that end EXACTLY with ".m3u8" ===
+                page.on('request', request => {
+                  const url = request.url();
+                  // Only match if the whole URL ends with .m3u8 (no ? or #)
                   if (/^https?:\/\/[^\s'"]+\.m3u8$/i.test(url) && !playlistLink) {
                     playlistLink = url;
                     playlistHeaders = request.headers();
+                    console.log('FOUND strict .m3u8 via request:', playlistLink);
                   }
-                } else {
-                  // Allow .m3u8 with query tokens for other sites
-                  if (url.match(/\.m3u8(\?.*)?$/i) && !playlistLink) {
-                    playlistLink = url;
-                    playlistHeaders = request.headers();
+                });
+
+                await page.goto(site, { waitUntil: 'networkidle2', timeout: 60000 });
+
+                // Wait 30–40 sec for Cloudflare (as before)
+                await delay(30000 + Math.random() * 10000);
+
+                try {
+                  await page.waitForSelector('body', { timeout: 60000 });
+                } catch {
+                  console.warn(`Timeout waiting for page content on ${site}`);
+                }
+
+                // === Fallback: scan HTML but only accept literal links that end with .m3u8 ===
+                if (!playlistLink) {
+                  const html = await page.content();
+
+                  // This regex finds http(s) links whose path ends with ".m3u8" and is immediately followed
+                  // by a quote, whitespace, angle bracket, closing parenthesis or end-of-string.
+                  // It will NOT match ".m3u8?token=..." or ".m3u8#frag".
+                  const regex = /https?:\/\/[^\s'"]+?\.m3u8(?=(?:['"\s<>)]|$))/gi;
+                  const matches = html.match(regex) || [];
+
+                  // Extra safety: ensure the extracted string literally ends with ".m3u8"
+                  const strictMatches = matches.filter(m => /\.m3u8$/i.test(m));
+
+                  if (strictMatches.length > 0) {
+                    playlistLink = strictMatches[0];
+                    playlistHeaders = {
+                      'referer': site,
+                      'user-agent': customUA,
+                      'origin': new URL(site).origin
+                    };
+                    console.log('FOUND strict .m3u8 via HTML scan:', playlistLink);
                   }
                 }
-              });
 
-              await page.goto(site, { waitUntil: 'networkidle2' });
-              await new Promise(resolve => setTimeout(resolve, 5000));
+                await page.close();
 
-              // Fallback: scan HTML for .m3u8
-              if (!playlistLink) {
-                const html = await page.content();
-                let matches = [];
-
-                if (isSmotret) {
-                  // Only strict .m3u8 for smotret-tv
-                  const regex = /https?:\/\/[^\s'"]+\.m3u8(?=(?:['"\s<>)]|$))/gi;
-                  matches = html.match(regex)?.filter(m => /\.m3u8$/i.test(m)) || [];
-                } else {
-                  const regex = /https?:\/\/[^\s'"]+\.m3u8[^\s'"]*/gi;
-                  matches = html.match(regex) || [];
+                if (!playlistLink) {
+                  console.error(`No strict .m3u8 link found for ${site}`);
+                  continue;
                 }
 
-                if (matches.length > 0) {
-                  playlistLink = matches[0];
-                  playlistHeaders = {
-                    'referer': site,
-                    'user-agent': customUA,
-                    'origin': new URL(site).origin
-                  };
-                }
+                const formattedHeaders = [];
+                if (playlistHeaders?.referer) formattedHeaders.push(`Referer: ${playlistHeaders.referer}`);
+                if (playlistHeaders?.['user-agent']) formattedHeaders.push(`User-Agent: ${playlistHeaders['user-agent']}`);
+                if (playlistHeaders?.origin) formattedHeaders.push(`Origin: ${playlistHeaders.origin}`);
+
+                const title = site.split('/').filter(Boolean).pop().replace(/\.html$/i, '');
+
+                results.push({
+                  title,
+                  updated: new Date().toISOString(),
+                  url: playlistLink,
+                  headers: formattedHeaders.join('\n')
+                });
+
+              } catch (err) {
+                console.error(`Error processing ${site}:`, err.message);
               }
-
-              await page.close();
-
-              if (!playlistLink) {
-                console.error(`No playlist link found for ${site}`);
-                continue;
-              }
-
-              const formattedHeaders = [];
-              if (playlistHeaders['referer']) formattedHeaders.push(`Referer: ${playlistHeaders['referer']}`);
-              if (playlistHeaders['user-agent']) formattedHeaders.push(`User-Agent: ${playlistHeaders['user-agent']}`);
-              if (playlistHeaders['origin']) formattedHeaders.push(`Origin: ${playlistHeaders['origin']}`);
-
-              const title = site.split('/').filter(Boolean).pop().replace(/\.html$/i, '');
-
-              results.push({
-                title,
-                updated: new Date().toISOString(),
-                url: playlistLink,
-                headers: formattedHeaders.join('\n')
-              });
             }
 
             await browser.close();
 
             fs.writeFileSync('channels.json', JSON.stringify(results, null, 2));
-            console.log('All playlist links saved to channels.json:\n', results);
+            console.log('All strict playlist links saved to channels.json');
           })();
           EOF
 
       - name: Run scraper
         run: node scraper.js
+        timeout-minutes: 10
 
       - name: Commit & Push JSON
         run: |
