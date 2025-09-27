@@ -33,8 +33,7 @@ jobs:
           'https://www.gledaitv.fan/nova-live-tv.html',
           'https://www.gledaitv.fan/btv-live-tv.html',
           'https://www.gledaitv.fan/mtv-hits-live-tv.html',
-          'https://www.gledaitv.fan/mtv-00s-live-tv.html',
-          'https://smotret-tv.live/mezzo.html'
+          'https://www.gledaitv.fan/mtv-00s-live-tv.html'
           ];
 
           (async () => {
@@ -56,16 +55,9 @@ jobs:
               // Catch .m3u8 links (with or without token)
               page.on('request', request => {
                 const url = request.url();
-                // For smotret-tv.live, only extract links that end in .m3u8
-                if (
-                  site.includes('smotret-tv.live') ?
-                    /\.m3u8$/i.test(url) :
-                    /\.m3u8(\?.*)?$/i.test(url)
-                ) {
-                  if (!playlistLink) {
-                    playlistLink = url;
-                    playlistHeaders = request.headers();
-                  }
+                if (url.match(/\.m3u8(\?.*)?$/i) && !playlistLink) {
+                  playlistLink = url;
+                  playlistHeaders = request.headers();
                 }
               });
 
@@ -75,14 +67,7 @@ jobs:
               // Fallback: scan HTML for .m3u8
               if (!playlistLink) {
                 const html = await page.content();
-                let regex;
-                if (site.includes('smotret-tv.live')) {
-                  // Only match links that end in .m3u8 for smotret-tv.live
-                  regex = /https?:\/\/[^\s'"<>]+\.m3u8\b/gi;
-                } else {
-                  // Regular fallback for other sites
-                  regex = /https?:\/\/[^\s'"]+\.m3u8[^\s'"]*/gi;
-                }
+                const regex = /https?:\/\/[^\s'"]+\.m3u8[^\s'"]*/gi;
                 const matches = html.match(regex);
                 if (matches && matches.length > 0) {
                   playlistLink = matches[0];
