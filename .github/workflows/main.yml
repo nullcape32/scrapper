@@ -33,7 +33,8 @@ jobs:
           'https://www.gledaitv.fan/nova-live-tv.html',
           'https://www.gledaitv.fan/btv-live-tv.html',
           'https://www.gledaitv.fan/mtv-hits-live-tv.html',
-          'https://www.gledaitv.fan/mtv-00s-live-tv.html'
+          'https://www.gledaitv.fan/mtv-00s-live-tv.html',
+'https://smotret-tv.live/mezzo.html'
           ];
 
           (async () => {
